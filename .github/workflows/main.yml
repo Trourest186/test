@@ -37,6 +37,8 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.PORT }}
-          script: whoami
+          script: |
+            docker pull registry.sotaicg.com/library/chaturmail-backend:${{ github.run_number }}
+            docker run -d -p 80:3000 --name reactjs-container registry.sotaicg.com/library/chaturmail-backend:${{ github.run_number }}
 
 
