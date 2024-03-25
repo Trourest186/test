@@ -37,7 +37,7 @@ jobs:
           echo "Tag: $TAG"
 
       - name: Build image to Harbor repository
-        run: docker build ./ -t $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
+        run: docker build ./ -t $REPOSIORY_NAME/$PROJECT_NAME/platform-backend
 
       - name: Push image to Harbor repository
         run: docker push $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
