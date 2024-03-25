@@ -12,7 +12,7 @@ on:
 
 env:
   REPOSITORY_NAME: registry.sotaicg.com
-  PROJECT_NAME: dev-backend
+  PROJECT_NAME: library
   TAG: latest
 
 jobs:
