@@ -46,5 +46,4 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           script: |
-            docker pull $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
-            docker compose up -f docker-compose-dev.yaml up --build -d 
+            pwd
