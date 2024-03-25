@@ -8,11 +8,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-      name: Show environment
-      run: echo "${{ secrets.REPOSITORY_PASSWORD  }}"
-    - uses: docker/login-action@v1
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Show environment
+      run: echo "${{ secrets.REPOSITORY_PASSWORD }}"
+    - name: Login to Docker registry
+      uses: docker/login-action@v1
       with:
         registry: http://registry.sotaicg.com/
-        username: ${{ secrets.REPOSITORY_PASSWORD  }}
-        password: ${{ secrets.REPOSITORY_USERNAME }}
+        username: ${{ secrets.REPOSITORY_USERNAME }}
+        password: ${{ secrets.REPOSITORY_PASSWORD }}
