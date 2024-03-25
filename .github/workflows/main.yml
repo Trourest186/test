@@ -2,19 +2,24 @@ name: BuildAndPushImageOnHarborAndUpdateArgoCDConfig
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-    - name: Show environment
-      run: echo "${{ secrets.REPOSITORY_PASSWORD }}"
-    - name: Login to Docker registry
-      uses: docker/login-action@v1
-      with:
-        registry: http://registry.sotaicg.com/
-        username: ${{ secrets.REPOSITORY_USERNAME }}
-        password: ${{ secrets.REPOSITORY_PASSWORD }}
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Show environment
+        run: echo "${{ secrets.REPOSITORY_PASSWORD }}"
+      - name: Login to Docker registry
+        uses: docker/login-action@v1
+        with:
+          registry: http://registry.sotaicg.com/
+          username: ${{ secrets.REPOSITORY_USERNAME }}
+          password: ${{ secrets.REPOSITORY_PASSWORD }}
+      - name: Build and push image to Harbor
+        run: |
+          docker build ./ -t registry.sotaicg.com/library/chaturmail-backend:${{ github.run_number }}
+          docker push registry.sotaicg.com/library/chaturmail-backend:${{ github.run_number }}
