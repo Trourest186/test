@@ -4,15 +4,9 @@ on:
   push:
     branches:
       - develop
-    branches-ignore:    
-      - 'feature/*'
-      - 'feat/*'
   pull_request:
     branches:
       - develop
-    branches-ignore:    
-      - 'feature/*'
-      - 'feat/*'
 
 env:
   REPOSIORY_NAME: registry.sotaicg.com
