@@ -29,15 +29,15 @@ jobs:
           username: ${{ secrets.REPOSITORY_USERNAME }}
           password: ${{ secrets.REPOSITORY_PASSWORD }}
           
-      # - name: Determine tag
-      #   run: |
-      #     if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
-      #       export TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
-      #     fi
-      #     echo "Tag: $TAG"
+      - name: Determine tag
+        run: |
+          if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
+            export TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          fi
+          echo "Tag: $TAG"
 
       - name: Build image to Harbor repository
-        run: docker build ./ -t $REPOSIORY_NAME/$PROJECT_NAME/platform-backend
+        run: docker build ./ -t registry.sotaicg.com/library/platform-backend
 
       - name: Push image to Harbor repository
         run: docker push $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
