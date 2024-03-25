@@ -33,14 +33,16 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
             export TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          else
+            export TAG="${{ env.TAG }}"  # Sử dụng biến TAG môi trường nếu không phải là tag
           fi
           echo "Tag: $TAG"
 
       - name: Build image to Harbor repository
-        run: docker build ./ -t registry.sotaicg.com/library/platform-backend
+        run: docker build ./ -t ${{ env.REPOSITORY_NAME }}/${{ env.PROJECT_NAME }}/platform-backend:${TAG}
 
       - name: Push image to Harbor repository
-        run: docker push $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
+        run: docker push ${{ env.REPOSITORY_NAME }}/${{ env.PROJECT_NAME }}/platform-backend:${TAG}
 
   deploy:
     needs: build
