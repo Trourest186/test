@@ -4,20 +4,20 @@ on:
   push:
     branches:
       - develop
+    tags:
+      - '*'  # Tất cả các tag
   pull_request:
     branches:
       - develop
 
 env:
-  REPOSIORY_NAME: registry.sotaicg.com
-  PROJECT_NAME: library
+  REPOSITORY_NAME: registry.sotaicg.com
+  PROJECT_NAME: dev-backend
   TAG: latest
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/heads/develop')
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,6 +29,13 @@ jobs:
           username: ${{ secrets.REPOSITORY_USERNAME }}
           password: ${{ secrets.REPOSITORY_PASSWORD }}
           
+      - name: Determine tag
+        run: |
+          if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
+            export TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+          fi
+          echo "Tag: $TAG"
+
       - name: Build image to Harbor repository
         run: docker build ./ -t $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
 
@@ -38,6 +45,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/develop')  # Chỉ triển khai khi push vào nhánh develop
     steps:
       - name: Executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.0.3
@@ -45,4 +53,8 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
-          script: ls
+          script: |
+            ls
+            cd ./dev-environment/docker-dev-datalake-platform
+            docker compose -f docker-compose-dev.yaml up --build -d
+            docker exec -it nginx nginx -s reload || { echo "Error: Failed to restart nginx"; exit 1; }
