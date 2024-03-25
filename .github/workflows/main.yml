@@ -1,31 +1,46 @@
-name: BuildAndPushImageOnHarborAndUpdateArgoCDConfig
+name: CI/CD for development environment
 
 on:
   push:
     branches:
-      - main
+      - develop
+    branches-ignore:    
+      - 'feature/*'
+      - 'feat/*'
   pull_request:
     branches:
-      - main
+      - develop
+    branches-ignore:    
+      - 'feature/*'
+      - 'feat/*'
+
+env:
+  REPOSIORY_NAME: registry.sotaicg.com
+  PROJECT_NAME: library
+  TAG: latest
 
 jobs:
+
   build:
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/devlop')
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Show environment
-        run: echo "${{ secrets.REPOSITORY_PASSWORD }}"
+
       - name: Login to Docker registry
         uses: docker/login-action@v1
         with:
           registry: http://registry.sotaicg.com/
           username: ${{ secrets.REPOSITORY_USERNAME }}
           password: ${{ secrets.REPOSITORY_PASSWORD }}
-      - name: Build and push image to Harbor
-        run: |
-          docker build ./ -t registry.sotaicg.com/library/chaturmail-backend:${{ github.run_number }}
-          docker push registry.sotaicg.com/library/chaturmail-backend:${{ github.run_number }}
+          
+      - name: Build image to Harbor repository
+        run: docker build ./ -t $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
+
+      - name: Push image to Harbor repository
+        run: docker push $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
@@ -36,9 +51,6 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
-          port: ${{ secrets.PORT }}
           script: |
-            docker pull registry.sotaicg.com/library/chaturmail-backend:${{ github.run_number }}
-            docker run -d -p 80:3000 --name reactjs-container registry.sotaicg.com/library/chaturmail-backend:${{ github.run_number }}
-
-
+            docker pull $REPOSIORY_NAME/$PROJECT_NAME/platform-backend:$TAG
+            docker compose up -f docker-compose-dev.yaml up --build -d 
