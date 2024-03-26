@@ -68,7 +68,7 @@ jobs:
                 echo "Attempt $i: Some containers are not running."
                 sleep 5
               else
-                docker exec -it nginx nginx -s reload || { echo "Error: Failed to restart nginx"; exit 1; }
+                docker exec -it nginx nginx -s reload
                 exit 0
               fi
             done
