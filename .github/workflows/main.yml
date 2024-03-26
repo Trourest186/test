@@ -32,11 +32,12 @@ jobs:
       - name: Determine tag
         run: |
           if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
-            export TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
+            TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
           else
-            export TAG="${{ env.TAG }}"
+            TAG="${{ env.TAG }}"
           fi
           echo "Tag: $TAG"
+          echo "TAG=$TAG" >> $GITHUB_ENV
 
       - name: Build image to Harbor repository
         run: docker build ./ -t ${{ env.REPOSITORY_NAME }}/${{ env.PROJECT_NAME }}/platform-backend:${TAG}
@@ -59,4 +60,16 @@ jobs:
             ls
             cd ./dev-environment/docker-dev-datalake-platform
             docker compose -f docker-compose-dev.yaml up --build -d
-            docker exec -it nginx nginx -s reload || { echo "Error: Failed to restart nginx"; exit 1; }
+
+            
+            for i in {1..10}
+            do
+              if docker ps -a | grep 'Exit'; then
+                echo "Attempt $i: Some containers are not running."
+                sleep 5
+              else
+                docker exec -it nginx nginx -s reload || { echo "Error: Failed to restart nginx"; exit 1; }
+                exit 0
+              fi
+            done
+            echo "After 10 attempts, some containers are still not running."
