@@ -1,4 +1,4 @@
-name: CI/CD for development environment
+name: CI/CD for development environment (BE)
 
 on:
   push:
