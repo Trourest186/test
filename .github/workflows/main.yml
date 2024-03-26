@@ -12,7 +12,7 @@ on:
 
 env:
   REPOSITORY_NAME: registry.sotaicg.com
-  PROJECT_NAME: library
+  PROJECT_NAME: dev-backend
   TAG: latest
 
 jobs:
@@ -34,7 +34,7 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/tags/"* ]]; then
             export TAG=$(echo "${{ github.ref }}" | sed 's/refs\/tags\///')
           else
-            export TAG="${{ env.TAG }}"  # Sử dụng biến TAG môi trường nếu không phải là tag
+            export TAG="${{ env.TAG }}"
           fi
           echo "Tag: $TAG"
 
@@ -47,7 +47,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/heads/develop')  # Chỉ triển khai khi push vào nhánh develop
+    if: startsWith(github.ref, 'refs/heads/develop')
     steps:
       - name: Executing remote ssh commands using password
         uses: appleboy/ssh-action@v1.0.3
