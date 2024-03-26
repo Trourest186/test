@@ -72,4 +72,4 @@ jobs:
                 exit 0
               fi
             done
-            echo "After 10 attempts, some containers are still not running."
+            echo "After 10 attempts, some containers are still not running..."
